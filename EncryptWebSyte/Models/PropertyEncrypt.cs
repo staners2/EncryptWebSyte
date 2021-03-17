@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using EncryptWebSyte.DataBase;
+using Microsoft.EntityFrameworkCore;
 
 namespace EncryptWebSyte.Models
 {
@@ -11,6 +13,9 @@ namespace EncryptWebSyte.Models
         [Required(ErrorMessage = "Поле для ввода ключа шифрования не заполнено")]
         public string InputEncryptKey { get; set; }
         [Required(ErrorMessage = "Поле для ввода текста не заполнено")]
+
+        [Key]
+        public int Id { get; set; }
         public string InputText { get; set; }
         public string DescryptKey { get; set; }
         public string ResultText { get; set; }
@@ -35,6 +40,7 @@ namespace EncryptWebSyte.Models
         {
             InputText = StringToRightLength(InputText);
             CutStringIntoBlocks(InputText);
+
             InputEncryptKey = CorrectKeyWord(InputEncryptKey, InputText.Length / (2 * Blocks.Length));
             DescryptKey = StringToBinaryFormat(InputEncryptKey);
 
@@ -54,7 +60,7 @@ namespace EncryptWebSyte.Models
 
             for (int i = 0; i < Blocks.Length; i++)
                 result += Blocks[i];
-            InputText = InputText.Replace("|","");
+            InputText = InputText.Replace("|", "");
             InputEncryptKey = InputEncryptKey.Replace("|", "");
             ResultText = StringFromBinaryToNormalFormat(result);
         }

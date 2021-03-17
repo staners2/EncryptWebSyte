@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using EncryptWebSyte.DataBase;
+using Microsoft.EntityFrameworkCore;
 
 namespace EncryptWebSyte.Controllers
 {
@@ -13,9 +15,12 @@ namespace EncryptWebSyte.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public DataContext db { get; set; }
+
+        public HomeController(ILogger<HomeController> logger, DataContext DataContext)
         {
             _logger = logger;
+            db = DataContext;
         }
 
         public IActionResult Index()
@@ -23,39 +28,6 @@ namespace EncryptWebSyte.Controllers
             return View();
         }
 
-        /*[HttpPost]
-        public IActionResult Index(PropertyEncrypt Prop)
-        {
-            if (ModelState.IsValid)
-            {
-                var EncryptObject = new PropertyEncrypt(Prop.InputText, Prop.InputEncryptKey);
-                EncryptObject.StartEncrypt();
-                ViewBag.InputEncryptKey = EncryptObject.InputEncryptKey;
-                ViewBag.InputEncryptText = EncryptObject.InputText;
-                ViewBag.DescryptKey = EncryptObject.DescryptKey;
-                ViewBag.ResultEncryptText = EncryptObject.ResultText;
-                return View();
-            }
-            
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Index(PropertyDescrypt Prop)
-        {
-            if (ModelState.IsValid)
-            {
-                var DescryptObject = new PropertyDescrypt(Prop.InputText, Prop.InputDescryptKey);
-                DescryptObject.StartDescrypt();
-                ViewBag.InputDescryptKey = DescryptObject.InputDescryptKey;
-                ViewBag.InputDescryptText = DescryptObject.InputText;
-                ViewBag.EncryptKey = DescryptObject.EncryptKey;
-                ViewBag.ResultDescryptText = DescryptObject.ResultText;
-                return View();
-            }
-            
-            return View();
-        }*/
         [HttpPost]
         public IActionResult Index(string TypeOperation, string InputText, string InputKey)
         {
@@ -73,6 +45,10 @@ namespace EncryptWebSyte.Controllers
                 ViewBag.DescryptKey = EncryptObject.DescryptKey;
                 ViewBag.ResultEncryptText = EncryptObject.ResultText;
 
+                db.Encrypts.Add(new Encrypt(InputText, EncryptObject.InputEncryptKey, EncryptObject.DescryptKey, EncryptObject.ResultText));
+                db.SaveChanges();
+
+
                 return View();
             }
             if (TypeOperation == "Descrypt")
@@ -83,6 +59,10 @@ namespace EncryptWebSyte.Controllers
                 ViewBag.InputDescryptText = DescryptObject.InputText;
                 ViewBag.EncryptKey = DescryptObject.EncryptKey;
                 ViewBag.ResultDescryptText = DescryptObject.ResultText;
+
+                db.Descrypts.Add(new Descrypt(InputText, DescryptObject.InputDescryptKey, DescryptObject.EncryptKey, DescryptObject.ResultText));
+                db.SaveChanges();
+
                 return View();
             }
             return View();
